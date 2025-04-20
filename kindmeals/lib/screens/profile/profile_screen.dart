@@ -507,6 +507,7 @@
 // }
 
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -549,10 +550,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Try the new direct API first
       try {
         final directProfileData = await _apiService.getDirectUserProfile();
-        print('=== DEBUG: Direct Profile Data ===');
-        print('Full direct profile data: $directProfileData');
-        print('User Type: ${directProfileData['userType']}');
-        print('Profile section: ${directProfileData['profile']}');
+        if (kDebugMode) {
+          print('=== DEBUG: Direct Profile Data ===');
+        }
+        if (kDebugMode) {
+          print('Full direct profile data: $directProfileData');
+        }
+        if (kDebugMode) {
+          print('User Type: ${directProfileData['userType']}');
+        }
+        if (kDebugMode) {
+          print('Profile section: ${directProfileData['profile']}');
+        }
 
         setState(() {
           _userData = {
@@ -565,8 +574,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
         return;
       } catch (directError) {
-        print(
+        if (kDebugMode) {
+          print(
             'Error loading profile with direct API, falling back: $directError');
+        }
         // Fall back to the old API
       }
 
@@ -583,7 +594,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _errorMessage = e.toString();
         _isLoading = false;
       });
-      print('Error loading profile: $e');
+      if (kDebugMode) {
+        print('Error loading profile: $e');
+      }
     }
   }
 
@@ -609,6 +622,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           throw Exception('Unknown user type');
         }
 
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Profile image updated successfully'),
@@ -618,7 +632,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         _loadUserProfile(); // Reload profile to get updated image URL
       } catch (e) {
-        print('Error uploading profile image: $e');
+        if (kDebugMode) {
+          print('Error uploading profile image: $e');
+        }
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to upload profile image: ${e.toString()}'),
@@ -669,6 +686,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 4,
@@ -839,10 +857,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.pop(context);
                         _handleLogout();
                       },
-                      child: const Text('Log Out'),
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.red,
                       ),
+                      child: const Text('Log Out'),
                     ),
                   ],
                 ),
@@ -901,6 +919,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
+                              // ignore: deprecated_member_use
                               color: Colors.green.withOpacity(0.3),
                               spreadRadius: 1,
                               blurRadius: 10,
@@ -924,6 +943,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
+                                          // ignore: deprecated_member_use
                                           color: Colors.black.withOpacity(0.2),
                                           spreadRadius: 2,
                                           blurRadius: 10,

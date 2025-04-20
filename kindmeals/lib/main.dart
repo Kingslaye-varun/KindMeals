@@ -3,7 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/auth/register_volunteer_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/volunteer/volunteer_dashboard.dart';
 import 'dart:developer' as developer;
 import 'services/firebase_service.dart';
 
@@ -104,7 +106,9 @@ class _KindMealsAppState extends State<KindMealsApp> {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
+        '/register/volunteer': (context) => const RegisterVolunteerScreen(),
         '/dashboard': (context) => const DashboardScreen(),
+        '/volunteer/dashboard': (context) => const VolunteerDashboardScreen(),
       },
       onGenerateRoute: (settings) {
         // Handle any undefined routes

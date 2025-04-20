@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kindmeals/screens/volunteer/volunteerdashboard.dart';
+import 'package:kindmeals/screens/volunteer/volunteer_dashboard.dart';
 import 'package:kindmeals/screens/volunteer/volunteerhistory.dart';
-import '../../services/firebase_service.dart';
 import '../../services/api_service.dart';
+import 'package:flutter/foundation.dart';
 
 class VolunteerProfileScreen extends StatefulWidget {
   const VolunteerProfileScreen({super.key});
@@ -13,7 +12,6 @@ class VolunteerProfileScreen extends StatefulWidget {
 }
 
 class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
-  final _firebaseService = FirebaseService();
   final _apiService = ApiService();
   bool _isLoading = true;
   Map<String, dynamic> _volunteerProfile = {};
@@ -28,9 +26,111 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
   }
 
   Future<void> _loadProfileData() async {
-    // Simulate loading data from API
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      setState(() {
+        _isLoading = true;
+      });
 
+      // Fetch volunteer profile data from API
+      final userProfile = await _apiService.getDirectUserProfile();
+
+      if (kDebugMode) {
+        print('Volunteer profile data: ${userProfile.toString()}');
+      }
+
+      if (userProfile['profile'] != null) {
+        // Set the volunteer profile data
+        setState(() {
+          _volunteerProfile = {
+            'name': userProfile['profile']['volunteerName'] ?? 'Unknown',
+            'avatar': userProfile['profile']['profileImage'] ??
+                'assets/images/volunteer1.jpg',
+            'deliveries': userProfile['profile']['totalRatings'] ?? 0,
+            'rating': userProfile['profile']['rating'] ?? 0.0,
+            'status': _isAvailable ? 'Available' : 'Unavailable',
+            'email': userProfile['profile']['email'] ?? '',
+            'phone': userProfile['profile']['volunteercontact'] ?? '',
+            'address': userProfile['profile']['volunteeraddress'] ?? '',
+            'joinDate': _formatJoinDate(userProfile['profile']['createdAt']),
+            'volunteerID': userProfile['profile']['_id'] ?? '',
+            'bio':
+                userProfile['profile']['volunteerabout'] ?? 'No bio available',
+            'hasVehicle': userProfile['profile']['hasVehicle'] ?? false,
+            'vehicleDetails': userProfile['profile']['vehicleDetails'] ?? {},
+          };
+        });
+      } else {
+        if (kDebugMode) {
+          print('No profile data found in response');
+        }
+
+        // Use mock data if API fails or returns no profile
+        _setMockProfile();
+      }
+
+      // Keep mock data for achievements and events
+      _setMockAchievementsAndEvents();
+
+      setState(() {
+        _isLoading = false;
+        _isAvailable = _volunteerProfile['status'] == 'Available';
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading volunteer profile: $e');
+      }
+
+      // Use mock data if API fails
+      _setMockProfile();
+      _setMockAchievementsAndEvents();
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading profile: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  String _formatJoinDate(String? dateStr) {
+    if (dateStr == null) return 'Unknown';
+
+    try {
+      final date = DateTime.parse(dateStr);
+
+      // Format as Month Day, Year
+      final months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+      ];
+
+      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error parsing date: $e');
+      }
+      return 'Unknown';
+    }
+  }
+
+  void _setMockProfile() {
     setState(() {
       _volunteerProfile = {
         'name': 'John Smith',
@@ -59,7 +159,11 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
           'vehicleType': 'Car',
         },
       };
+    });
+  }
 
+  void _setMockAchievementsAndEvents() {
+    setState(() {
       _achievements = [
         {
           'id': '1',
@@ -133,16 +237,13 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
           'participating': false,
         },
       ];
-
-      _isLoading = false;
-      _isAvailable = _volunteerProfile['status'] == 'Available';
     });
   }
 
   void _navigateToHome() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const VolunteerHomeScreen()),
+      MaterialPageRoute(builder: (context) => const VolunteerDashboardScreen()),
     );
   }
 
@@ -290,10 +391,33 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 60,
-            backgroundImage: AssetImage(_volunteerProfile['avatar']),
-          ),
+          _volunteerProfile['avatar'] != null &&
+                  _volunteerProfile['avatar'].toString().startsWith('/uploads')
+              ? CircleAvatar(
+                  radius: 60,
+                  backgroundImage: NetworkImage(
+                    '${ApiService.baseUrl}${_volunteerProfile['avatar']}',
+                  ),
+                  onBackgroundImageError: (e, stackTrace) {
+                    if (kDebugMode) {
+                      print('Error loading profile image: $e');
+                    }
+                  },
+                  backgroundColor: Colors.green.shade100,
+                  child: _volunteerProfile['avatar'] == null
+                      ? Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Colors.green.shade700,
+                        )
+                      : null,
+                )
+              : CircleAvatar(
+                  radius: 60,
+                  backgroundImage:
+                      const AssetImage('assets/images/volunteer1.jpg'),
+                  backgroundColor: Colors.green.shade100,
+                ),
           const SizedBox(height: 16),
           Text(
             _volunteerProfile['name'],
@@ -310,7 +434,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'ID: ${_volunteerProfile['volunteerID']}',
+              'ID: ${_volunteerProfile['volunteerID'].toString().substring(0, 8)}',
               style: TextStyle(
                 color: Colors.green.shade800,
                 fontWeight: FontWeight.w500,
@@ -410,7 +534,17 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
   }
 
   Widget _buildImpactStats() {
-    final impactStats = _volunteerProfile['impactStats'];
+    // Create impact stats from the deliveries count
+    final deliveries = _volunteerProfile['deliveries'] ?? 0;
+
+    final impactStats = {
+      'mealsDelivered':
+          deliveries * 10, // Assuming average 10 meals per delivery
+      'carbonSaved':
+          '${(deliveries * 2.5).toStringAsFixed(1)}kg', // Rough estimate
+      'communitiesServed': (deliveries / 5).ceil(), // Estimate
+      'totalHours': deliveries * 2, // Assuming 2 hours per delivery
+    };
 
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
@@ -424,6 +558,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.green.withOpacity(0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
@@ -521,6 +656,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
@@ -577,7 +713,24 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
   }
 
   Widget _buildPreferences() {
-    final preferences = _volunteerProfile['preferences'];
+    // Create preferences based on vehicle details
+    final hasVehicle = _volunteerProfile['hasVehicle'] ?? false;
+    final vehicleDetails = _volunteerProfile['vehicleDetails'] ?? {};
+
+    final preferences = {
+      'maxDistance': '10km', // Default value
+      'availableDays': [
+        'Monday',
+        'Wednesday',
+        'Friday',
+        'Saturday'
+      ], // Default value
+      'availableHours': '9:00 AM - 6:00 PM', // Default value
+      'notificationsEnabled': true, // Default value
+      'vehicleType': hasVehicle
+          ? (vehicleDetails['vehicleType'] ?? 'Not specified')
+          : 'None',
+    };
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -587,6 +740,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
@@ -705,6 +859,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -801,7 +956,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
               ],
             ),
           ),
-          ..._upcomingEvents.map((event) => _buildEventCard(event)).toList(),
+          ..._upcomingEvents.map((event) => _buildEventCard(event)),
         ],
       ),
     );
@@ -815,6 +970,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -983,6 +1139,7 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),

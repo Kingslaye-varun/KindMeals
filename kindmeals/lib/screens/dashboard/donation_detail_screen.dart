@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../services/api_service.dart';
 import '../../config/api_config.dart';
 
@@ -20,6 +21,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
   final _apiService = ApiService();
   bool _isLoading = false;
   String? _error;
+  bool _needsVolunteer = false;
 
   // Helper to get image URL from donation data
   String? _getImageUrl() {
@@ -36,6 +38,18 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
     return null;
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize _needsVolunteer based on the donation's original setting
+    // This will set the toggle switch to match the donor's preference initially
+    _needsVolunteer = widget.donation['needsVolunteer'] == true;
+
+    if (kDebugMode) {
+      print('Initializing with donor volunteer preference: $_needsVolunteer');
+    }
+  }
+
   Future<void> _acceptDonation() async {
     try {
       setState(() {
@@ -43,7 +57,10 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
         _error = null;
       });
 
-      await _apiService.acceptDonation(widget.donation['_id']);
+      await _apiService.acceptDonation(
+        donationId: widget.donation['_id'],
+        needsVolunteer: _needsVolunteer,
+      );
 
       if (mounted) {
         // Call the onDonationAccepted callback if provided
@@ -52,9 +69,12 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Donation accepted successfully!'),
+          SnackBar(
+            content: Text(_needsVolunteer
+                ? 'Donation accepted successfully. A volunteer will assist with delivery.'
+                : 'Donation accepted successfully. You will need to collect this yourself.'),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
           ),
         );
         Navigator.pop(context, true); // Return true to indicate success
@@ -219,6 +239,84 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                           widget.donation['description'],
                           style: const TextStyle(fontSize: 16),
                         ),
+                        const SizedBox(height: 16),
+
+                        // Volunteer assistance switch
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: _needsVolunteer
+                                ? Colors.orange.shade50
+                                : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _needsVolunteer
+                                  ? Colors.orange.shade200
+                                  : Colors.grey.shade300,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.volunteer_activism,
+                                    color: _needsVolunteer
+                                        ? Colors.orange
+                                        : Colors.grey,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Need Volunteer Assistance?',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: _needsVolunteer
+                                                ? Colors.orange.shade800
+                                                : Colors.grey.shade800,
+                                          ),
+                                        ),
+                                        Text(
+                                          _needsVolunteer
+                                              ? 'Yes, I need a volunteer to help deliver this donation'
+                                              : 'No, I will pick up this donation myself',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: _needsVolunteer,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _needsVolunteer = value;
+                                      });
+                                    },
+                                    activeColor: Colors.orange,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Note: This was initially set based on the donor\'s preference',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
                         const SizedBox(height: 24),
                         SizedBox(
                           width: double.infinity,

@@ -1,6 +1,9 @@
 class ApiConfig {
-  // API base URL - update with your actual server IP address
-  static const String serverBaseUrl = 'http://192.168.0.101:5000';
+  // API base URL - use localhost for emulator or your actual server IP
+  // Note: For Android emulator, use 10.0.2.2 instead of localhost
+  // For iOS simulator, use localhost
+  // For physical devices, use your actual server IP address
+  static const String serverBaseUrl = 'http://192.168.168.180:5000';
   static const String apiBaseUrl = '$serverBaseUrl/api';
 
   // Debug information

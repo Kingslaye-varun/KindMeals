@@ -99,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               if (_selectedType == 'Donor') {
                 await _apiService.registerDonor(
-                  name: _nameController.text,
+                  donorname: _nameController.text,
                   orgName: _orgNameController.text,
                   identificationId: _idController.text,
                   address: _addressController.text,
@@ -121,8 +121,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 );
               } else if (_selectedType == 'Volunteer') {
                 await _apiService.registerVolunteer(
-                  name: _nameController.text,
-                  aadharId: _idController.text,
+                  volunteerName: _nameController.text,
+                  aadharID: _idController.text,
                   address: _addressController.text,
                   contact: _contactController.text,
                   about: _aboutController.text,

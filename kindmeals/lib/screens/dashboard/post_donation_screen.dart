@@ -28,7 +28,6 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
   bool _isUserDonor = false;
   bool _isCheckingUserType = true;
   String _errorMessage = '';
-  Map<String, dynamic>? _userProfile;
 
   final List<String> _foodTypes = ['veg', 'nonveg', 'jain'];
 
@@ -55,7 +54,6 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
       print('DEBUG: User profile received: ${userProfile.toString()}');
 
       // Store the user profile for later use
-      _userProfile = userProfile;
 
       final userType = userProfile['userType'] ?? '';
 
@@ -187,6 +185,17 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
 
         // Force token refresh to ensure we have the latest token
         await FirebaseAuth.instance.currentUser?.getIdToken(true);
+
+        // Add note to explain volunteer option to users
+        if (_needsVolunteer) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Note: When your donation is accepted by a recipient, they will be able to request a volunteer for delivery.'),
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
 
         await _apiService.createDonation(
           foodName: _foodNameController.text,

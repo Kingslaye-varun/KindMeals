@@ -6,7 +6,7 @@ import 'package:kindmeals/screens/leaderboard/donorleaderboard.dart';
 import 'package:kindmeals/screens/leaderboard/volunteerleaderboard.dart';
 import 'package:kindmeals/screens/profile/donor_history_screen.dart';
 import 'package:kindmeals/screens/profile/profile_screen.dart';
-import 'package:kindmeals/screens/volunteer/volunteerdashboard.dart';
+// import 'package:kindmeals/screens/volunteer/volunteerdashboard.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../services/firebase_service.dart';
@@ -903,7 +903,7 @@ class _HomeScreenState extends State<_HomeScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const VolunteerHomeScreen(),
+              builder: (context) => const VolunteersScreen(),
             ),
           );
         },

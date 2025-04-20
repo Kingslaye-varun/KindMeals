@@ -184,4 +184,34 @@ class FirebaseService {
 
   // Stream of auth state changes
   Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Register with email and password (alias for signUpWithEmailAndPassword for clarity)
+  Future<UserCredential> registerWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    return signUpWithEmailAndPassword(email, password);
+  }
+
+  // Register user role with backend
+  Future<void> registerUserRole(String email, String role) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      developer.log('Registering user role: $role for email: $email');
+
+      // This is handled by the API service when registering specific user types
+      // Just a placeholder method for compatibility
+      developer.log(
+          'User role registration handled by individual registration endpoints');
+
+      return;
+    } catch (e) {
+      developer.log('Error registering user role: $e');
+      throw Exception('Failed to register user role: $e');
+    }
+  }
 }
