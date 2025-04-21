@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import '../../services/api_service.dart';
 import '../../config/api_config.dart';
 import '../../utils/date_time_helper.dart';
+import '../../utils/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -203,6 +204,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
   }
 
   Future<void> _acceptDonation() async {
+    final AppLocalizations localizations = AppLocalizations.of(context);
     try {
       setState(() {
         _isLoading = true;
@@ -223,8 +225,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(_needsVolunteer
-                ? 'Donation accepted successfully. A volunteer will assist with delivery.'
-                : 'Donation accepted successfully. You will need to collect this yourself.'),
+                ? localizations.translate('donation_accepted_with_volunteer')
+                : localizations.translate('donation_accepted_self_pickup')),
             backgroundColor: _primaryColor,
             duration: const Duration(seconds: 3),
           ),
@@ -282,15 +284,16 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
     final String? imageUrl = _getImageUrl();
-    final String foodName = widget.donation['foodName'] ?? 'Unknown Food';
+    final String foodName = widget.donation['foodName'] ?? localizations.translate('unknown_food');
     final String description =
-        widget.donation['description'] ?? 'No description available';
-    final String foodType = widget.donation['foodType'] ?? 'Unknown';
-    final String quantity = '${widget.donation['quantity'] ?? 0} servings';
+        widget.donation['description'] ?? localizations.translate('no_description_available');
+    final String foodType = widget.donation['foodType'] ?? localizations.translate('unknown');
+    final String quantity = '${widget.donation['quantity'] ?? 0} ${localizations.translate('servings')}';
     final String address =
-        widget.donation['location']?['address'] ?? 'Unknown location';
-    final String donorName = widget.donation['donorName'] ?? 'Anonymous Donor';
+        widget.donation['location']?['address'] ?? localizations.translate('unknown_location');
+    final String donorName = widget.donation['donorName'] ?? localizations.translate('anonymous_donor');
     final bool needsVolunteerOriginal =
         widget.donation['needsVolunteer'] == true;
 
@@ -305,9 +308,9 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text(
-          'Donation Details',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          localizations.translate('donation_details'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: _primaryColor,
@@ -331,12 +334,12 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                             ApiConfig.getImageUrl(imageUrl),
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return _buildPlaceholderImage(foodType);
+                              return _buildPlaceholderImage(foodType, localizations);
                             },
                           ),
                         )
                       else
-                        _buildPlaceholderImage(foodType),
+                        _buildPlaceholderImage(foodType, localizations),
 
                       // Food type badge
                       Positioned(
@@ -395,9 +398,9 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   size: 14,
                                 ),
                                 const SizedBox(width: 4),
-                                const Text(
-                                  'EXPIRING SOON',
-                                  style: TextStyle(
+                                Text(
+                                  localizations.translate('expiring_soon').toUpperCase(),
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12,
@@ -490,7 +493,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          'Expires: ${expiryDateTime.split(" ")[0]}',
+                                          '${localizations.translate('expires')}: ${expiryDateTime.split(" ")[0]}',
                                           style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
@@ -512,19 +515,19 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
 
                         // Donor Information
                         _buildSectionContainer(
-                          title: 'Donor Information',
+                          title: localizations.translate('donor_information'),
                           icon: Icons.person,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildInfoItem(
-                                label: 'Donor',
+                                label: localizations.translate('donor'),
                                 value: donorName,
                                 icon: Icons.person_outline,
                               ),
                               const SizedBox(height: 12),
                               _buildInfoItem(
-                                label: 'Location',
+                                label: localizations.translate('location'),
                                 value: address,
                                 icon: Icons.location_on_outlined,
                               ),
@@ -536,7 +539,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
 
                         // Food Description
                         _buildSectionContainer(
-                          title: 'Food Description',
+                          title: localizations.translate('food_description'),
                           icon: Icons.description_outlined,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -562,7 +565,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      'Exact expiry: $expiryDateTime',
+                                      '${localizations.translate('exact_expiry')}: $expiryDateTime',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
@@ -582,7 +585,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
 
                         // Volunteer assistance section
                         _buildSectionContainer(
-                          title: 'Delivery Options',
+                          title: localizations.translate('delivery_options'),
                           icon: Icons.delivery_dining,
                           backgroundColor: _needsVolunteer
                               ? _accentColor.withOpacity(0.08)
@@ -601,7 +604,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Need volunteer assistance?',
+                                          localizations.translate('need_volunteer_assistance'),
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
@@ -613,8 +616,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                         const SizedBox(height: 4),
                                         Text(
                                           _needsVolunteer
-                                              ? 'Yes, request volunteer help for delivery'
-                                              : 'No, I will pick up this donation myself',
+                                              ? localizations.translate('yes_request_volunteer')
+                                              : localizations.translate('no_pickup_myself'),
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: Colors.grey.shade700,
@@ -657,7 +660,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
-                                          'You changed this from the donor\'s original setting',
+                                          localizations.translate('changed_from_original'),
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: Colors.blue.shade700,
@@ -679,7 +682,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        'Using donor\'s preferred delivery option',
+                                        localizations.translate('using_donor_preference'),
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontStyle: FontStyle.italic,
@@ -712,8 +715,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
                                 elevation: 2,
                               ),
                               child: Text(
-                                'ACCEPT THIS DONATION',
-                                style: TextStyle(
+                                localizations.translate('accept_donation').toUpperCase(),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1,
@@ -766,7 +769,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
     );
   }
 
-  Widget _buildPlaceholderImage(String foodType) {
+  Widget _buildPlaceholderImage(String foodType, AppLocalizations localizations) {
     return Container(
       height: 220,
       width: double.infinity,
@@ -794,7 +797,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No image available',
+            localizations.translate('no_image_available'),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,

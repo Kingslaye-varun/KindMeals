@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io' show Platform;
@@ -896,7 +894,7 @@ class _ViewDonationsScreenState extends State<ViewDonationsScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'No image available',
+                                localizations.translate('no_image_available'),
                                 style: TextStyle(
                                   color: _primaryGreen,
                                   fontWeight: FontWeight.w500,
