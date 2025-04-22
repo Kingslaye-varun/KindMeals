@@ -53,3 +53,5 @@ app.*.map.json
 .env.development
 .env.test
 .env.production
+
+backend/.env
