@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: kindmeals-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: UPLOADS_DIR
+        value: /data/uploads
+    disk:
+      name: uploads
+      mountPath: /data
+      sizeGB: 5 

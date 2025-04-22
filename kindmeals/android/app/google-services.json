@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "656754915837",
+    "project_id": "kindmeals-5c993",
+    "storage_bucket": "kindmeals-5c993.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656754915837:android:ddcb83bfaee7682ec30194",
+        "android_client_info": {
+          "package_name": "com.example.kindmeals"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "656754915837-vn3kpqohi1qlmkhdok2d6blg42mino13.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kindmeals",
+            "certificate_hash": "811a645951069ebdc42f49cc20f2ef307b295aa5"
+          }
+        },
+        {
+          "client_id": "656754915837-ptuuvhmc049utfgatk42bdsv6k04m66j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAO5ZEm_xRYLVA-9GNO7KVs8Ctrx0C0VvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "656754915837-ptuuvhmc049utfgatk42bdsv6k04m66j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -45,5 +45,17 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>tel</string>
+		<string>mailto</string>
+		<string>sms</string>
+		<string>maps</string>
+		<string>comgooglemaps</string>
+		<string>comgooglemaps-x-callback</string>
+		<string>googlechromes</string>
+	</array>
 </dict>
 </plist>

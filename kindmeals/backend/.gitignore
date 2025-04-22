@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+backend/.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Exclude uploads directory contents but keep the directory structure
+uploads/*
+!uploads/.gitkeep
+ 
