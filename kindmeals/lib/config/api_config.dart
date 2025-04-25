@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConfig {
@@ -8,10 +9,18 @@ class ApiConfig {
 
   // Debug information
   static void printAPIConfig() {
-    print('====== API Configuration ======');
-    print('Server Base URL: $serverBaseUrl');
-    print('API Base URL: $apiBaseUrl');
-    print('==============================');
+    if (kDebugMode) {
+      print('====== API Configuration ======');
+    }
+    if (kDebugMode) {
+      print('Server Base URL: $serverBaseUrl');
+    }
+    if (kDebugMode) {
+      print('API Base URL: $apiBaseUrl');
+    }
+    if (kDebugMode) {
+      print('==============================');
+    }
   }
 
   // Method to get full image URL
@@ -28,7 +37,9 @@ class ApiConfig {
     if (imagePath.startsWith('/uploads/')) {
       // Use direct URL to handle server configuration with static files
       final url = serverBaseUrl + imagePath;
-      print('Constructed image URL: $url');
+      if (kDebugMode) {
+        print('Constructed image URL: $url');
+      }
       return url;
     }
 

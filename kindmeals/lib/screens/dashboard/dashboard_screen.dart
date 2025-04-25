@@ -406,7 +406,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    AppLocalizations.of(context);
     
     return Scaffold(
       body: SafeArea(
@@ -809,6 +809,7 @@ class _HomeScreenState extends State<_HomeScreen> {
                                           backgroundImage: _getImageProvider(
                                               volunteer['avatar']),
                                           onBackgroundImageError: (_, __) {},
+                                          backgroundColor: Colors.grey.shade300,
                                           child: volunteer['avatar']
                                                       .toString()
                                                       .isEmpty ||
@@ -831,7 +832,6 @@ class _HomeScreenState extends State<_HomeScreen> {
                                               ? const Icon(Icons.person,
                                                   color: Colors.white)
                                               : null,
-                                          backgroundColor: Colors.grey.shade300,
                                         ),
                                       ),
                                     ),
@@ -1113,6 +1113,7 @@ class _HomeScreenState extends State<_HomeScreen> {
                                           backgroundImage: _getImageProvider(
                                               donor['avatar']),
                                           onBackgroundImageError: (_, __) {},
+                                          backgroundColor: Colors.grey.shade300,
                                           child: donor['avatar']
                                                       .toString()
                                                       .isEmpty ||
@@ -1135,7 +1136,6 @@ class _HomeScreenState extends State<_HomeScreen> {
                                               ? const Icon(Icons.storefront,
                                                   color: Colors.white)
                                               : null,
-                                          backgroundColor: Colors.grey.shade300,
                                         ),
                                       ),
                                     ),

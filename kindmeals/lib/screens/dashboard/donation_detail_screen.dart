@@ -1,12 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:io' show Platform;
 import '../../services/api_service.dart';
 import '../../config/api_config.dart';
 import '../../utils/date_time_helper.dart';
 import '../../utils/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class DonationDetailScreen extends StatefulWidget {
   final Map<String, dynamic> donation;
@@ -60,148 +59,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
   }
 
   // Launch phone call intent for calling the donor
-  void _launchPhoneCall(String phoneNumber) async {
-    try {
-      // Clean up phone number to ensure it's just digits, plus sign, and dashes
-      final cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^\d\+\-]'), '');
-
-      // Create the tel: URI
-      final Uri uri = Uri.parse('tel:$cleanedNumber');
-
-      if (kDebugMode) {
-        print('Attempting to launch phone app with: $uri');
-      }
-
-      // Use launchUrl instead of canLaunch/launch for more reliable behavior
-      final bool launched = await launchUrl(uri);
-
-      if (!launched) {
-        if (kDebugMode) {
-          print('Could not launch phone app with URI: $uri');
-        }
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Could not open phone app. Please dial $phoneNumber manually.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error launching phone call: $e');
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not make call: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
   
   // Launch Google Maps with directions to donor's location
-  Future<void> _launchMapsDirections(String destinationAddress) async {
-    try {
-      // Try multiple approaches for launching maps based on platform
-      bool launched = false;
-
-      if (Platform.isAndroid) {
-        // Try Android-specific intent
-        try {
-          final String encodedDestination = Uri.encodeComponent(destinationAddress);
-          final Uri uri = Uri.parse(
-              'https://www.google.com/maps/dir/?api=1&destination=$encodedDestination&travelmode=driving');
-
-          if (kDebugMode) {
-            print('Trying Google Maps URI for Android: $uri');
-          }
-
-          if (await canLaunchUrl(uri)) {
-            launched = await launchUrl(
-              uri,
-              mode: LaunchMode.externalApplication,
-            );
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            print('Error with Google Maps URI: $e');
-          }
-        }
-      } else if (Platform.isIOS) {
-        // iOS approach - try Apple Maps first
-        try {
-          final String encodedDestination = Uri.encodeComponent(destinationAddress);
-          final Uri uri = Uri.parse(
-              'https://maps.apple.com/?daddr=$encodedDestination&dirflg=d');
-
-          if (kDebugMode) {
-            print('Trying Apple Maps URI: $uri');
-          }
-
-          if (await canLaunchUrl(uri)) {
-            launched = await launchUrl(
-              uri,
-              mode: LaunchMode.externalApplication,
-            );
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            print('Error with Apple Maps URI: $e');
-          }
-        }
-      }
-
-      // Last resort - try web URL if all else failed
-      if (!launched) {
-        final String encodedDestination = Uri.encodeComponent(destinationAddress);
-        final Uri uri = Uri.parse(
-            'https://www.google.com/maps/search/?api=1&query=$encodedDestination');
-
-        if (kDebugMode) {
-          print('Trying web fallback: $uri');
-        }
-
-        if (await canLaunchUrl(uri)) {
-          launched = await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
-        } else {
-          throw Exception('Could not launch maps on this device');
-        }
-      }
-      
-      if (!launched) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Could not open maps. Please try again.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error launching Maps: $e');
-      }
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
 
   Future<void> _acceptDonation() async {
     final AppLocalizations localizations = AppLocalizations.of(context);

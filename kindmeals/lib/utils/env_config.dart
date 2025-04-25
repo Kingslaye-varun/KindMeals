@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// A utility class for accessing environment variables throughout the app.
@@ -60,7 +61,9 @@ class EnvConfig {
 
     for (final variable in requiredVariables) {
       if (dotenv.env[variable]?.isEmpty ?? true) {
-        print('WARNING: Required environment variable $variable is not set!');
+        if (kDebugMode) {
+          print('WARNING: Required environment variable $variable is not set!');
+        }
         return false;
       }
     }

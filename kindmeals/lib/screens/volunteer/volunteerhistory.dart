@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +21,7 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
   List<Map<String, dynamic>> _acceptedDonations = [];
   List<Map<String, dynamic>> _filteredDonations = [];
   String _filterCriteria = 'All'; // Default filter
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -990,7 +992,6 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
         : 'Recently';
 
     final foodName = donation['foodName'] ?? 'Unknown Food';
-    final description = donation['description'] ?? 'No description provided';
     final quantity = donation['quantity'] ?? 0;
     final foodType = donation['foodType']?.toString().toLowerCase() ?? '';
 
@@ -1002,10 +1003,6 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
         'Unknown Donor';
 
     // Get recipient information
-    final recipientInfo = donation['recipientInfo'] ?? {};
-    final recipientName = donation['recipientName'] ??
-        recipientInfo['recipientName'] ??
-        'Unknown Recipient';
 
     // Food type icon and color
     final (IconData foodTypeIcon, Color foodTypeColor) =

@@ -1,3 +1,5 @@
+// ignore_for_file: equal_keys_in_map
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';

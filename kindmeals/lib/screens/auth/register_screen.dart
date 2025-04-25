@@ -5,7 +5,6 @@ import '../../services/firebase_service.dart';
 import '../../services/api_service.dart';
 import '../../services/location_service.dart';
 import '../../utils/app_localizations.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -147,14 +146,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       try {
         // First, create Firebase authentication
-        print('Starting Firebase registration...');
+        if (kDebugMode) {
+          print('Starting Firebase registration...');
+        }
         final userCredential =
             await _firebaseService.signUpWithEmailAndPassword(
           _emailController.text.trim(),
           _passwordController.text,
         );
 
-        print('Firebase registration successful: ${userCredential.user?.uid}');
+        if (kDebugMode) {
+          print('Firebase registration successful: ${userCredential.user?.uid}');
+        }
 
         // Verify the user is properly authenticated
         if (userCredential.user == null) {
@@ -167,7 +170,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         try {
           // Register directly to the appropriate collection based on selected type
-          print('Starting direct registration for type: $_selectedType');
+          if (kDebugMode) {
+            print('Starting direct registration for type: $_selectedType');
+          }
 
           // Try up to 3 times with exponentially increasing delays
           int retryCount = 0;
@@ -177,8 +182,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           while (retryCount < 3 && !success) {
             try {
               if (retryCount > 0) {
-                print(
+                if (kDebugMode) {
+                  print(
                     'Retrying direct registration (attempt ${retryCount + 1})...');
+                }
                 // Exponential backoff
                 await Future.delayed(
                     Duration(milliseconds: 500 * (1 << retryCount)));
@@ -224,11 +231,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               }
 
               success = true;
-              print('Direct registration successful');
+              if (kDebugMode) {
+                print('Direct registration successful');
+              }
               break;
             } catch (e) {
               lastError = e as Exception;
-              print('Error on attempt ${retryCount + 1}: $e');
+              if (kDebugMode) {
+                print('Error on attempt ${retryCount + 1}: $e');
+              }
               retryCount++;
             }
           }
@@ -255,18 +266,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
             );
           }
         } catch (e) {
-          print('Error during registration: $e');
+          if (kDebugMode) {
+            print('Error during registration: $e');
+          }
           // If profile registration fails, delete the Firebase user
           try {
             await userCredential.user?.delete();
-            print('Firebase user deleted after registration failure');
+            if (kDebugMode) {
+              print('Firebase user deleted after registration failure');
+            }
           } catch (deleteError) {
-            print('Could not delete Firebase user: $deleteError');
+            if (kDebugMode) {
+              print('Could not delete Firebase user: $deleteError');
+            }
           }
           rethrow;
         }
       } catch (e) {
-        print('Error during registration: $e');
+        if (kDebugMode) {
+          print('Error during registration: $e');
+        }
         if (mounted) {
           String errorMessage = 'Registration failed';
           if (e.toString().contains('E11000')) {
@@ -280,21 +299,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else if (e.toString().contains('No authenticated user found')) {
             errorMessage = 'Authentication failed. Please try again.';
           } else if (e.toString().contains('Failed to register donor: ')) {
-            print('Donor registration error: ${e.toString()}');
+            if (kDebugMode) {
+              print('Donor registration error: ${e.toString()}');
+            }
             errorMessage = e
                 .toString()
                 .replaceAll('Exception: Failed to register donor: ', '');
           } else if (e.toString().contains('Failed to register recipient: ')) {
-            print('Recipient registration error: ${e.toString()}');
+            if (kDebugMode) {
+              print('Recipient registration error: ${e.toString()}');
+            }
             errorMessage = e
                 .toString()
                 .replaceAll('Exception: Failed to register recipient: ', '');
           } else if (e.toString().contains('Cannot connect to server')) {
-            print('Server connection error: ${e.toString()}');
+            if (kDebugMode) {
+              print('Server connection error: ${e.toString()}');
+            }
             errorMessage =
                 'Cannot connect to server. Please check your internet connection and try again.';
           } else {
-            print('Unhandled error: ${e.toString()}');
+            if (kDebugMode) {
+              print('Unhandled error: ${e.toString()}');
+            }
             errorMessage = e.toString().replaceAll('Exception: ', '');
           }
 

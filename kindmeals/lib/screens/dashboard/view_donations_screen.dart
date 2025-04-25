@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io' show Platform;
@@ -6,7 +8,6 @@ import '../../config/api_config.dart';
 import 'donation_detail_screen.dart';
 import '../../utils/date_time_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import '../../utils/app_localizations.dart';
 
 class ViewDonationsScreen extends StatefulWidget {
@@ -55,9 +56,13 @@ class _ViewDonationsScreenState extends State<ViewDonationsScreen> {
         _errorMessage = '';
       });
 
-      print('Fetching live donations...');
+      if (kDebugMode) {
+        print('Fetching live donations...');
+      }
       final donations = await _apiService.getLiveDonations();
-      print('Fetched ${donations.length} donations');
+      if (kDebugMode) {
+        print('Fetched ${donations.length} donations');
+      }
 
       setState(() {
         _donations = donations;
@@ -65,7 +70,9 @@ class _ViewDonationsScreenState extends State<ViewDonationsScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error fetching donations: $e');
+      if (kDebugMode) {
+        print('Error fetching donations: $e');
+      }
       String errorMsg = e.toString().replaceAll('Exception: ', '');
       
       final AppLocalizations localizations = AppLocalizations.of(context);
@@ -703,7 +710,6 @@ class _ViewDonationsScreenState extends State<ViewDonationsScreen> {
   Widget _buildEmptyState() {
     final AppLocalizations localizations = AppLocalizations.of(context);
     // Create a text controller to clear the search field
-    final TextEditingController controller = TextEditingController();
 
 
     return Center(

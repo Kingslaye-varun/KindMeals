@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -168,7 +169,7 @@ class _KindMealsAppState extends State<KindMealsApp> {
 
 // Screen to check user type and redirect accordingly
 class _InitialLoadingScreen extends StatefulWidget {
-  const _InitialLoadingScreen({Key? key}) : super(key: key);
+  const _InitialLoadingScreen();
 
   @override
   State<_InitialLoadingScreen> createState() => _InitialLoadingScreenState();
@@ -196,7 +197,9 @@ class _InitialLoadingScreenState extends State<_InitialLoadingScreen> {
         }
       }
     } catch (e) {
-      print('Error checking user type: $e');
+      if (kDebugMode) {
+        print('Error checking user type: $e');
+      }
       // Default to regular dashboard if error occurs
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/dashboard');

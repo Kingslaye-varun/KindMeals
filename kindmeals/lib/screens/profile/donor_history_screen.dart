@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 import '../../config/api_config.dart';
@@ -44,7 +46,9 @@ class _DonorHistoryScreenState extends State<DonorHistoryScreen> {
         _errorMessage = '';
       });
 
-      print('Fetching donor donation history...');
+      if (kDebugMode) {
+        print('Fetching donor donation history...');
+      }
       final donationsData = await _apiService.getDonorDonations();
 
       setState(() {
@@ -55,9 +59,13 @@ class _DonorHistoryScreenState extends State<DonorHistoryScreen> {
         _isLoading = false;
       });
 
-      print('Fetched ${_donations.length} donations');
+      if (kDebugMode) {
+        print('Fetched ${_donations.length} donations');
+      }
     } catch (e) {
-      print('Error fetching donations: $e');
+      if (kDebugMode) {
+        print('Error fetching donations: $e');
+      }
       String errorMsg = e.toString().replaceAll('Exception: ', '');
 
       // Provide more user-friendly error messages

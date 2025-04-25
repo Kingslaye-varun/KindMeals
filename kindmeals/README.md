@@ -1,53 +1,112 @@
-# KindMeals
+# KindMeals Flutter App
 
-A food donation app that connects donors, volunteers, and recipients to reduce food waste and help those in need.
+This is the Flutter front-end application for KindMeals, a food donation platform connecting donors, volunteers, and recipients.
 
-## Environment Setup
+## Setting Up Development Environment
 
-This project uses environment variables for sensitive data like API keys. Before running the app, follow these steps:
+### Prerequisites
+- Flutter SDK (2.0 or higher)
+- Dart (2.12 or higher)
+- Android Studio / VS Code with Flutter plugins
+- A Firebase project with Authentication enabled
+- A Razorpay test account for payment integration
 
-1. Create a `.env` file in the root directory of the project
-2. Add the following variables to your `.env` file:
+### Installation Steps
 
+1. **Clone the repository and navigate to the Flutter project**
+   ```
+   git clone https://github.com/yourusername/kindmeals.git
+   cd kindmeals
+   ```
+
+2. **Install dependencies**
+   ```
+   flutter pub get
+   ```
+
+3. **Run the app**
+   ```
+   flutter run
+   ```
+
+### App Logo
+
+The app uses a custom logo located at `assets/images/KindMeals_applogo.jpg`. To update the app icon on both Android and iOS platforms:
+
+1. Replace the placeholder file at `assets/images/KindMeals_applogo.jpg` with your logo image
+2. Run the following command to generate the app icons:
+   ```
+   flutter pub run flutter_launcher_icons
+   ```
+
+This will update all necessary app icon files for both Android and iOS.
+
+### Firebase Configuration
+
+The app requires Firebase for authentication and data storage. To set up Firebase:
+
+1. Create a project in the [Firebase Console](https://console.firebase.google.com/)
+2. Add your app to the Firebase project
+3. Download the `google-services.json` file for Android and place it in `android/app/`
+4. Download the `GoogleService-Info.plist` file for iOS and place it in `ios/Runner/`
+
+### Environment Configuration
+
+Create a `.env` file in the root directory with the following variables:
 ```
-# KindMeals API Keys
+API_URL=your_backend_api_url
 RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-
-# Firebase Configuration
-FIREBASE_API_KEY=your_firebase_api_key
-FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-FIREBASE_PROJECT_ID=your_firebase_project_id
-FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-FIREBASE_APP_ID=your_firebase_app_id
-
-# Other Configuration
-API_URL=your_api_url
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 
-3. Replace `your_razorpay_key_id`, etc. with your actual API keys and configuration values.
+## Project Structure
 
-## Important Note
-
-- The `.env` file is listed in `.gitignore` and should never be committed to version control.
-- For production deployments, use a secure method to set environment variables.
-
-## Getting Started
-
-1. Clone the repository
-2. Set up the `.env` file as described above
-3. Run `flutter pub get` to install dependencies
-4. Run `flutter run` to start the app
+- `lib/main.dart` - Entry point of the application
+- `lib/screens/` - UI screens
+- `lib/widgets/` - Reusable UI components
+- `lib/models/` - Data models
+- `lib/services/` - API services and business logic
+- `lib/utils/` - Utility functions and helpers
 
 ## Features
 
-- Donate food to recipients in need
-- Track donations and impact
-- Volunteer for food delivery
-- Support charities through direct donations
-- Leaderboards to recognize top donors and volunteers
+- Multi-language support (English, Hindi, Marathi)
+- Firebase authentication
+- Role-based access control
+- Food donation listing and management
+- Volunteer matching system
+- Razorpay payment integration
+- Location services
 
-## Backend
+## Building for Production
 
-This app requires a backend service to function properly. The backend code is available in the `backend` directory.
+### Android
+
+```
+flutter build apk --release
+```
+
+The APK will be available at `build/app/outputs/flutter-apk/app-release.apk`
+
+### iOS
+
+```
+flutter build ios --release
+```
+
+Then archive the app using Xcode.
+
+## Troubleshooting
+
+- If you encounter Firebase related errors, ensure the `google-services.json` file is properly placed and the dependencies are up to date
+- For Razorpay issues, verify your API keys and check the implementation in the services directory
+
+## Backend Integration
+
+The backend API is deployed at: [API URL]
+You can find the backend repository at: [Backend Repository URL]
+
+## Contact
+
+For any queries regarding the Flutter application, please contact:
+[Your Contact Information]

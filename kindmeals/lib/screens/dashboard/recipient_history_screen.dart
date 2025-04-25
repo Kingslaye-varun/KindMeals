@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,6 @@ import '../../config/api_config.dart';
 import '../../utils/date_time_helper.dart';
 import '../../services/location_service.dart';
 import '../../utils/app_localizations.dart';
-import 'package:intl/intl.dart';
 
 class RecipientHistoryScreen extends StatefulWidget {
   const RecipientHistoryScreen({super.key});
@@ -50,11 +49,15 @@ class _RecipientHistoryScreenState extends State<RecipientHistoryScreen> {
         _errorMessage = '';
       });
 
-      print('Fetching recipient donation history...');
+      if (kDebugMode) {
+        print('Fetching recipient donation history...');
+      }
 
       // Use the version with distance information
       final donations = await _apiService.getRecipientDonationsWithDistance();
-      print('Fetched ${donations.length} accepted donations');
+      if (kDebugMode) {
+        print('Fetched ${donations.length} accepted donations');
+      }
 
       setState(() {
         _acceptedDonations = donations;
@@ -64,7 +67,9 @@ class _RecipientHistoryScreenState extends State<RecipientHistoryScreen> {
             donation.containsKey('distance') && donation['distance'] != null);
       });
     } catch (e) {
-      print('Error fetching accepted donations: $e');
+      if (kDebugMode) {
+        print('Error fetching accepted donations: $e');
+      }
       String errorMsg = e.toString().replaceAll('Exception: ', '');
       
       final AppLocalizations localizations = AppLocalizations.of(context);
@@ -239,7 +244,9 @@ class _RecipientHistoryScreenState extends State<RecipientHistoryScreen> {
           );
         }
       } catch (e) {
-        print('Error adding feedback: $e');
+        if (kDebugMode) {
+          print('Error adding feedback: $e');
+        }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -914,7 +921,7 @@ class _RecipientHistoryScreenState extends State<RecipientHistoryScreen> {
                             ? localizations.translate('today')
                             : daysSinceAccepted == 1
                                 ? localizations.translate('yesterday')
-                                : '${daysSinceAccepted} ${localizations.translate('days_ago')}',
+                                : '$daysSinceAccepted ${localizations.translate('days_ago')}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,

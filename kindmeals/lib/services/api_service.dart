@@ -543,14 +543,20 @@ class ApiService {
       // Debug the returned dates
       if (kDebugMode && responseData != null) {
         if (responseData['expiryDateTime'] != null) {
-          print('Response expiryDateTime: ${responseData['expiryDateTime']}');
+          if (kDebugMode) {
+            print('Response expiryDateTime: ${responseData['expiryDateTime']}');
+          }
 
           // Parse the returned date and display in local time
           final returnedDate = DateTime.parse(responseData['expiryDateTime']);
-          print(
+          if (kDebugMode) {
+            print(
               'Parsed response expiryDateTime (UTC): ${returnedDate.toString()}');
-          print(
+          }
+          if (kDebugMode) {
+            print(
               'Parsed response expiryDateTime (Local): ${returnedDate.toLocal().toString()}');
+          }
         }
       }
 

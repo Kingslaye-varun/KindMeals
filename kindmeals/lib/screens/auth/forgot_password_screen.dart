@@ -69,7 +69,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               setState(() {
                                 _isLoading = true;
                               });
-                              // TODO: Implement password reset logic
                               // After successful reset:
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

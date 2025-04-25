@@ -17,7 +17,7 @@ class ImageHelper {
     // Handle paths that start with /uploads/
     if (imagePath.startsWith('/uploads/')) {
       // Remove the leading slash and use the assets directory
-      final formattedPath = 'assets${imagePath}';
+      final formattedPath = 'assets$imagePath';
       return AssetImage(formattedPath);
     }
 
@@ -84,7 +84,7 @@ class ImageHelper {
     // Handle paths that start with /uploads/
     String assetPath = imagePath;
     if (imagePath.startsWith('/uploads/')) {
-      assetPath = 'assets${imagePath}';
+      assetPath = 'assets$imagePath';
     } else if (imagePath.contains('uploads/') &&
         !imagePath.startsWith('assets/')) {
       assetPath = 'assets/$imagePath';
