@@ -551,11 +551,11 @@ class ApiService {
           final returnedDate = DateTime.parse(responseData['expiryDateTime']);
           if (kDebugMode) {
             print(
-              'Parsed response expiryDateTime (UTC): ${returnedDate.toString()}');
+                'Parsed response expiryDateTime (UTC): ${returnedDate.toString()}');
           }
           if (kDebugMode) {
             print(
-              'Parsed response expiryDateTime (Local): ${returnedDate.toLocal().toString()}');
+                'Parsed response expiryDateTime (Local): ${returnedDate.toLocal().toString()}');
           }
         }
       }
@@ -809,6 +809,115 @@ class ApiService {
     } catch (e) {
       if (kDebugMode) {
         print('Error in registerVolunteer: $e');
+      }
+      rethrow;
+    }
+  }
+
+  // Update volunteer profile
+  Future<void> updateVolunteerProfile({
+    String? name,
+    String? contact,
+    String? address,
+    String? about,
+    bool? hasVehicle,
+    Map<String, dynamic>? vehicleDetails,
+    double? latitude,
+    double? longitude,
+    File? profileImage,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No authenticated user found');
+
+    try {
+      if (kDebugMode) {
+        print('Attempting to update volunteer profile...');
+      }
+
+      // Get auth token
+      final idToken = await user.getIdToken();
+
+      // Create multipart request with the new endpoint
+      final request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/volunteer/profile'),
+      );
+
+      // Add auth header
+      request.headers['Authorization'] = 'Bearer $idToken';
+
+      // Add text fields if provided
+      if (name != null) request.fields['volunteerName'] = name;
+      if (contact != null) request.fields['volunteercontact'] = contact;
+      if (address != null) request.fields['volunteeraddress'] = address;
+      if (about != null) request.fields['volunteerabout'] = about;
+      if (hasVehicle != null)
+        request.fields['hasVehicle'] = hasVehicle.toString();
+      if (latitude != null) request.fields['latitude'] = latitude.toString();
+      if (longitude != null) request.fields['longitude'] = longitude.toString();
+
+      // Add vehicle details if provided
+      if (vehicleDetails != null) {
+        if (vehicleDetails['vehicleType'] != null) {
+          request.fields['vehicleType'] = vehicleDetails['vehicleType'];
+        }
+        if (vehicleDetails['vehicleNumber'] != null) {
+          request.fields['vehicleNumber'] = vehicleDetails['vehicleNumber'];
+        }
+      }
+
+      // Add profile image if provided
+      if (profileImage != null) {
+        final fileName = profileImage.path.split('/').last;
+        final extension = fileName.split('.').last.toLowerCase();
+
+        String contentType;
+        if (extension == 'png') {
+          contentType = 'image/png';
+        } else {
+          contentType = 'image/jpeg';
+        }
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'profileImage',
+            profileImage.path,
+            contentType: MediaType.parse(contentType),
+          ),
+        );
+
+        if (kDebugMode) {
+          print('Added profile image to update request: ${profileImage.path}');
+        }
+      }
+
+      // Send the request
+      try {
+        if (kDebugMode) {
+          print('Sending update request to: ${request.url}');
+        }
+
+        final streamedResponse = await request.send();
+        final response = await http.Response.fromStream(streamedResponse);
+
+        if (kDebugMode) {
+          print(
+              'Volunteer profile update response: ${response.statusCode} | ${response.body}');
+        }
+
+        if (response.statusCode != 200) {
+          throw Exception(
+              'Failed to update volunteer profile: ${response.body}');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error during profile update request: $e');
+        }
+        rethrow;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating volunteer profile: $e');
       }
       rethrow;
     }

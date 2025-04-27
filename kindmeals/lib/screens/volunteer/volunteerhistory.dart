@@ -7,6 +7,7 @@ import '../../services/api_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'volunteer_dashboard.dart';
 import 'volunteerprofile.dart';
+import '../../config/api_config.dart';
 
 class VolunteerHistoryScreen extends StatefulWidget {
   const VolunteerHistoryScreen({super.key});
@@ -157,11 +158,14 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
     final distanceTraveled = '3.8 km';
     final carbonSaved = '0.76 kg';
 
-    // Get food image URL
+    // Get food image URL with updated API config
     String? imageUrl;
     if (donation['imageUrl'] != null &&
         donation['imageUrl'].toString().isNotEmpty) {
-      imageUrl = '${ApiService.baseUrl}${donation['imageUrl']}';
+      imageUrl = ApiConfig.getImageUrl(donation['imageUrl']);
+      if (kDebugMode) {
+        print('Image URL for food: $imageUrl');
+      }
     }
 
     // Get donor information with improved fallbacks
@@ -1008,11 +1012,14 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
     final (IconData foodTypeIcon, Color foodTypeColor) =
         _getFoodTypeUI(foodType);
 
-    // Get food image URL
+    // Get food image URL with updated API config
     String? imageUrl;
     if (donation['imageUrl'] != null &&
         donation['imageUrl'].toString().isNotEmpty) {
-      imageUrl = '${ApiService.baseUrl}${donation['imageUrl']}';
+      imageUrl = ApiConfig.getImageUrl(donation['imageUrl']);
+      if (kDebugMode) {
+        print('Image URL for food card: $imageUrl');
+      }
     }
 
     return Container(

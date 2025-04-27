@@ -3,6 +3,9 @@ import 'package:kindmeals/screens/volunteer/volunteerhistory.dart';
 import '../../services/api_service.dart';
 import 'package:flutter/foundation.dart';
 import '../../config/api_config.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import '../../services/location_service.dart';
 
 class VolunteerProfileScreen extends StatefulWidget {
   const VolunteerProfileScreen({super.key});
@@ -13,16 +16,38 @@ class VolunteerProfileScreen extends StatefulWidget {
 
 class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
   final _apiService = ApiService();
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _bioController = TextEditingController();
+  final _aadharController = TextEditingController();
   bool _isLoading = true;
+  bool _isEditing = false;
+  bool _isSaving = false;
   Map<String, dynamic> _volunteerProfile = {};
   List<Map<String, dynamic>> _achievements = [];
   List<Map<String, dynamic>> _upcomingEvents = [];
   bool _isAvailable = true;
+  File? _imageFile;
+  final _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     _loadProfileData();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _bioController.dispose();
+    _aadharController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadProfileData() async {
@@ -60,6 +85,14 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
             'volunteerlocation': userProfile['profile']['volunteerlocation'] ??
                 {'latitude': 0.0, 'longitude': 0.0},
           };
+
+          // Initialize controllers with current data
+          _nameController.text = _volunteerProfile['name'];
+          _emailController.text = _volunteerProfile['email'];
+          _phoneController.text = _volunteerProfile['phone'];
+          _addressController.text = _volunteerProfile['address'];
+          _bioController.text = _volunteerProfile['bio'];
+          _aadharController.text = _volunteerProfile['aadharID'];
         });
       } else {
         if (kDebugMode) {
@@ -99,6 +132,129 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         );
       }
     }
+  }
+
+  // Method to update volunteer profile
+  Future<void> _updateVolunteerProfile() async {
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      // Get current location for profile update
+      final currentPosition = await LocationService.getCurrentLocation();
+
+      // Call the API to update profile
+      await _apiService.updateVolunteerProfile(
+        name: _nameController.text,
+        contact: _phoneController.text,
+        address: _addressController.text,
+        about: _bioController.text,
+        latitude: currentPosition?.latitude,
+        longitude: currentPosition?.longitude,
+        profileImage: _imageFile,
+      );
+
+      // Update local profile data with new values (even if backend failed)
+      setState(() {
+        _volunteerProfile['name'] = _nameController.text;
+        _volunteerProfile['phone'] = _phoneController.text;
+        _volunteerProfile['address'] = _addressController.text;
+        _volunteerProfile['bio'] = _bioController.text;
+
+        // If image was picked, update UI immediately rather than waiting for server
+        if (_imageFile != null) {
+          // This will be handled by the _buildProfileImageProvider method
+        }
+
+        _isEditing = false;
+        _isSaving = false;
+      });
+
+      // Try refreshing the profile data, but don't block on it
+      try {
+        await _loadProfileData();
+      } catch (e) {
+        // If refresh fails, we already updated the UI with local changes
+        if (kDebugMode) {
+          print('Profile refresh failed, but UI is already updated: $e');
+        }
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isSaving = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating profile: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Method to pick image from gallery or camera
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error picking image: $e');
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
+    }
+  }
+
+  // Method to show image source selection dialog
+  Future<void> _showImageSourceDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Photo'),
+        content: const Text('Choose where to select a photo from'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.camera);
+            },
+            child: const Text('Camera'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.gallery);
+            },
+            child: const Text('Gallery'),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatJoinDate(String? dateStr) {
@@ -161,6 +317,14 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
           'vehicleType': 'Car',
         },
       };
+
+      // Initialize controllers with mock data
+      _nameController.text = _volunteerProfile['name'];
+      _emailController.text = _volunteerProfile['email'];
+      _phoneController.text = _volunteerProfile['phone'];
+      _addressController.text = _volunteerProfile['address'];
+      _bioController.text = _volunteerProfile['bio'];
+      _aadharController.text = 'XXXX-XXXX-XXXX';
     });
   }
 
@@ -459,6 +623,14 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
         print('Profile image path: $profileImage');
       }
 
+      if (profileImage.toString().startsWith('assets/')) {
+        return CircleAvatar(
+          radius: 60,
+          backgroundImage: AssetImage(profileImage.toString()),
+          backgroundColor: Colors.green.shade100,
+        );
+      }
+
       // Use ApiConfig helper to get correct URL
       String imageUrl = ApiConfig.getImageUrl(profileImage.toString());
       if (kDebugMode) {
@@ -679,19 +851,76 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
           ),
         ],
       ),
+      child: _isEditing
+          ? _buildEditProfileForm()
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(
+                      Icons.person,
+                      size: 20,
+                      color: Colors.black87,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Contact Information',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _buildInfoRow(Icons.email, 'Email', _volunteerProfile['email']),
+                _buildInfoRow(Icons.phone, 'Phone', _volunteerProfile['phone']),
+                _buildInfoRow(
+                    Icons.home, 'Address', _volunteerProfile['address']),
+                _buildInfoRow(Icons.calendar_today, 'Member Since',
+                    _volunteerProfile['joinDate']),
+                const SizedBox(height: 16),
+                Center(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _isEditing = true;
+                      });
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.green.shade700,
+                      side: BorderSide(color: Colors.green.shade700),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 24),
+                    ),
+                    child: const Text('EDIT PROFILE'),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildEditProfileForm() {
+    return Form(
+      key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Row(
             children: [
               Icon(
-                Icons.person,
+                Icons.edit,
                 size: 20,
                 color: Colors.black87,
               ),
               SizedBox(width: 8),
               Text(
-                'Contact Information',
+                'Edit Profile',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -700,32 +929,213 @@ class _VolunteerProfileScreenState extends State<VolunteerProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildInfoRow(Icons.email, 'Email', _volunteerProfile['email']),
-          _buildInfoRow(Icons.phone, 'Phone', _volunteerProfile['phone']),
-          _buildInfoRow(Icons.home, 'Address', _volunteerProfile['address']),
-          _buildInfoRow(Icons.calendar_today, 'Member Since',
-              _volunteerProfile['joinDate']),
-          const SizedBox(height: 16),
+
+          // Profile Image Selection
           Center(
-            child: OutlinedButton(
-              onPressed: () {
-                // Edit profile functionality
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.green.shade700,
-                side: BorderSide(color: Colors.green.shade700),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+            child: Stack(
+              children: [
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: _imageFile != null
+                      ? FileImage(_imageFile!)
+                      : _buildProfileImageProvider(),
+                  backgroundColor: Colors.grey.shade200,
                 ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              ),
-              child: const Text('EDIT PROFILE'),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.green.shade700,
+                    child: IconButton(
+                      icon: const Icon(Icons.camera_alt,
+                          color: Colors.white, size: 18),
+                      onPressed: _showImageSourceDialog,
+                    ),
+                  ),
+                ),
+              ],
             ),
+          ),
+          const SizedBox(height: 24),
+
+          TextFormField(
+            controller: _nameController,
+            decoration: InputDecoration(
+              labelText: 'Name',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.person_outline),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your name';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          TextFormField(
+            controller: _emailController,
+            decoration: InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.email_outlined),
+            ),
+            enabled: false, // Email cannot be changed
+          ),
+          const SizedBox(height: 16),
+
+          TextFormField(
+            controller: _phoneController,
+            decoration: InputDecoration(
+              labelText: 'Phone',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.phone_outlined),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your phone number';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          TextFormField(
+            controller: _addressController,
+            decoration: InputDecoration(
+              labelText: 'Address',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.home_outlined),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your address';
+              }
+              return null;
+            },
+            maxLines: 2,
+          ),
+          const SizedBox(height: 16),
+
+          TextFormField(
+            controller: _bioController,
+            decoration: InputDecoration(
+              labelText: 'Bio',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.description_outlined),
+            ),
+            maxLines: 3,
+          ),
+          const SizedBox(height: 16),
+
+          TextFormField(
+            controller: _aadharController,
+            decoration: InputDecoration(
+              labelText: 'Aadhar ID',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.credit_card_outlined),
+            ),
+            enabled: false, // Aadhar ID cannot be changed
+          ),
+          const SizedBox(height: 24),
+
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isEditing = false;
+
+                      // Reset controllers to original values
+                      _nameController.text = _volunteerProfile['name'];
+                      _phoneController.text = _volunteerProfile['phone'];
+                      _addressController.text = _volunteerProfile['address'];
+                      _bioController.text = _volunteerProfile['bio'];
+
+                      // Reset image file
+                      _imageFile = null;
+                    });
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey.shade700,
+                    side: BorderSide(color: Colors.grey.shade400),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text('CANCEL'),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _isSaving
+                      ? null
+                      : () {
+                          if (_formKey.currentState!.validate()) {
+                            _updateVolunteerProfile();
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade700,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('SAVE CHANGES'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  // Helper method to build profile image provider
+  ImageProvider _buildProfileImageProvider() {
+    final profileImage = _volunteerProfile['avatar'];
+
+    if (profileImage != null && profileImage.toString().isNotEmpty) {
+      if (profileImage.toString().startsWith('assets/')) {
+        return AssetImage(profileImage);
+      } else {
+        final imageUrl = ApiConfig.getImageUrl(profileImage.toString());
+        if (kDebugMode) {
+          print('Profile image URL: $imageUrl');
+        }
+        return NetworkImage(imageUrl);
+      }
+    }
+
+    return const AssetImage('assets/images/default_profile.png');
   }
 
   Widget _buildPreferences() {
