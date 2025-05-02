@@ -8,10 +8,10 @@ class DonationScreen extends StatefulWidget {
   final String charityName;
 
   const DonationScreen({
-    Key? key,
+    super.key,
     required this.charityId,
     required this.charityName,
-  }) : super(key: key);
+  });
 
   @override
   State<DonationScreen> createState() => _DonationScreenState();

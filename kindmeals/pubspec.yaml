@@ -50,6 +50,7 @@ dependencies:
   url_launcher: ^6.2.5
   razorpay_flutter: ^1.4.0
   flutter_dotenv: ^5.1.0
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +65,16 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+# App icon configuration
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/KindMeals_applogo.jpg"
+  adaptive_icon_background: "#A8B8A3" # Light sage green background color
+  adaptive_icon_foreground: "assets/images/KindMeals_applogo.jpg"
+  min_sdk_android: 21 # Android 5.0 (Lollipop)
+  remove_alpha_ios: true
 
 # The following section is specific to Flutter packages.
 flutter:

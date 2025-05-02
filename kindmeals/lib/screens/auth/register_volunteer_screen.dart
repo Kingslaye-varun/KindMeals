@@ -5,7 +5,6 @@ import '../../services/firebase_service.dart';
 import '../../services/api_service.dart';
 import '../../services/location_service.dart';
 import '../../utils/app_localizations.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
 
 class RegisterVolunteerScreen extends StatefulWidget {
@@ -194,7 +193,9 @@ class _RegisterVolunteerScreenState extends State<RegisterVolunteerScreen> {
           );
         }
       } catch (e) {
-        print('Error during volunteer registration: $e');
+        if (kDebugMode) {
+          print('Error during volunteer registration: $e');
+        }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

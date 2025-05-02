@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use, duplicate_ignore
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,7 +9,6 @@ import 'package:kindmeals/config/api_config.dart';
 import 'package:kindmeals/services/firebase_service.dart';
 import 'package:kindmeals/utils/app_localizations.dart';
 import 'edit_profile_screen.dart';
-import 'donor_history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -520,6 +521,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
+                                          // ignore: duplicate_ignore
                                           // ignore: deprecated_member_use
                                           color: Colors.black.withOpacity(0.2),
                                           spreadRadius: 2,

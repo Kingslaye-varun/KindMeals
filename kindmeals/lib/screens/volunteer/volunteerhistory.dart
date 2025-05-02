@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +7,7 @@ import '../../services/api_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'volunteer_dashboard.dart';
 import 'volunteerprofile.dart';
+import '../../config/api_config.dart';
 
 class VolunteerHistoryScreen extends StatefulWidget {
   const VolunteerHistoryScreen({super.key});
@@ -19,7 +22,7 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
   List<Map<String, dynamic>> _acceptedDonations = [];
   List<Map<String, dynamic>> _filteredDonations = [];
   String _filterCriteria = 'All'; // Default filter
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -155,11 +158,14 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
     final distanceTraveled = '3.8 km';
     final carbonSaved = '0.76 kg';
 
-    // Get food image URL
+    // Get food image URL with updated API config
     String? imageUrl;
     if (donation['imageUrl'] != null &&
         donation['imageUrl'].toString().isNotEmpty) {
-      imageUrl = '${ApiService.baseUrl}${donation['imageUrl']}';
+      imageUrl = ApiConfig.getImageUrl(donation['imageUrl']);
+      if (kDebugMode) {
+        print('Image URL for food: $imageUrl');
+      }
     }
 
     // Get donor information with improved fallbacks
@@ -990,7 +996,6 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
         : 'Recently';
 
     final foodName = donation['foodName'] ?? 'Unknown Food';
-    final description = donation['description'] ?? 'No description provided';
     final quantity = donation['quantity'] ?? 0;
     final foodType = donation['foodType']?.toString().toLowerCase() ?? '';
 
@@ -1002,20 +1007,19 @@ class _VolunteerHistoryScreenState extends State<VolunteerHistoryScreen> {
         'Unknown Donor';
 
     // Get recipient information
-    final recipientInfo = donation['recipientInfo'] ?? {};
-    final recipientName = donation['recipientName'] ??
-        recipientInfo['recipientName'] ??
-        'Unknown Recipient';
 
     // Food type icon and color
     final (IconData foodTypeIcon, Color foodTypeColor) =
         _getFoodTypeUI(foodType);
 
-    // Get food image URL
+    // Get food image URL with updated API config
     String? imageUrl;
     if (donation['imageUrl'] != null &&
         donation['imageUrl'].toString().isNotEmpty) {
-      imageUrl = '${ApiService.baseUrl}${donation['imageUrl']}';
+      imageUrl = ApiConfig.getImageUrl(donation['imageUrl']);
+      if (kDebugMode) {
+        print('Image URL for food card: $imageUrl');
+      }
     }
 
     return Container(

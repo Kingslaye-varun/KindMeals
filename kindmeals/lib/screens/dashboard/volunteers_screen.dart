@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '../../services/api_service.dart';
@@ -77,7 +79,9 @@ class _VolunteersScreenState extends State<VolunteersScreen> {
 
             if (volunteers.isNotEmpty) {
               // Debug log the first item to verify structure
-              print('First volunteer data: ${volunteers[0]}');
+              if (kDebugMode) {
+                print('First volunteer data: ${volunteers[0]}');
+              }
             }
           });
         }
@@ -86,7 +90,9 @@ class _VolunteersScreenState extends State<VolunteersScreen> {
         _setDemoData();
       }
     } catch (e) {
-      print('Error fetching volunteers: $e');
+      if (kDebugMode) {
+        print('Error fetching volunteers: $e');
+      }
       // Fall back to demo data on error
       _setDemoData();
     } finally {
@@ -162,7 +168,9 @@ class _VolunteersScreenState extends State<VolunteersScreen> {
     
     // Debug print to diagnose data structure
     if (_volunteers.isNotEmpty && kDebugMode) {
-      print('Volunteer data sample: ${_volunteers[0]}');
+      if (kDebugMode) {
+        print('Volunteer data sample: ${_volunteers[0]}');
+      }
     }
 
     // Sort volunteers by donations in descending order
@@ -495,7 +503,7 @@ class _VolunteersScreenState extends State<VolunteersScreen> {
         return CircleAvatar(
           radius: 24,
           backgroundImage: NetworkImage(
-            '${ApiService.baseUrl}${imageUrl}',
+            '${ApiService.baseUrl}$imageUrl',
           ),
           onBackgroundImageError: (e, stackTrace) {
             if (kDebugMode) {

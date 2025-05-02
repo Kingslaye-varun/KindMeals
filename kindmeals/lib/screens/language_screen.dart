@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../utils/app_localizations.dart';
 import 'auth/login_screen.dart';
 
@@ -50,12 +49,12 @@ class _LanguageScreenState extends State<LanguageScreen> {
       'en': AppLanguage.english,
       'hi': AppLanguage.hindi,
       'mr': AppLanguage.marathi,
-      'gu': AppLanguage.english, // Currently defaulting to English for unsupported languages
-      'ta': AppLanguage.english,
-      'te': AppLanguage.english,
-      'kn': AppLanguage.english,
-      'ml': AppLanguage.english,
-      'bn': AppLanguage.english,
+      'gu': AppLanguage.gujarati,
+      'ta': AppLanguage.tamil,
+      'te': AppLanguage.telugu,
+      'kn': AppLanguage.kannada,
+      'ml': AppLanguage.malayalam,
+      'bn': AppLanguage.bengali,
       'pa': AppLanguage.english,
       'or': AppLanguage.english,
       'as': AppLanguage.english,

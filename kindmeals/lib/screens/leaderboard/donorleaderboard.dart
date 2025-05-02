@@ -1,3 +1,6 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 import '../../config/api_config.dart';
@@ -49,7 +52,9 @@ class _DonorLeaderboardScreenState extends State<DonorLeaderboardScreen> {
         });
       }
     } catch (e) {
-      print('Error fetching donor data: $e');
+      if (kDebugMode) {
+        print('Error fetching donor data: $e');
+      }
       // If API fails, we'll use existing data
     } finally {
       if (mounted) {
@@ -354,7 +359,9 @@ class _DonorLeaderboardScreenState extends State<DonorLeaderboardScreen> {
       backgroundColor: Colors.green.shade100,
       backgroundImage: NetworkImage(imageUrl),
       onBackgroundImageError: (e, stackTrace) {
-        print('Error loading profile image: $e');
+        if (kDebugMode) {
+          print('Error loading profile image: $e');
+        }
       },
       child: Container(
         decoration: BoxDecoration(

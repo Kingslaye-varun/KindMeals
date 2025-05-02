@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -38,10 +39,9 @@ void main() async {
     } else {
       developer.log('Firebase already initialized');
     }
-    
+
     // Load saved language preference
     await AppLocalizations.localizationsService.loadSavedLanguage();
-    
   } catch (e) {
     developer.log('Error during initialization: $e', error: e);
     rethrow;
@@ -108,18 +108,25 @@ class _KindMealsAppState extends State<KindMealsApp> {
   @override
   Widget build(BuildContext context) {
     // Get current locale from the localization service
-    final currentLocale = Provider.of<AppLocalizationsService>(context).currentLocale;
+    final currentLocale =
+        Provider.of<AppLocalizationsService>(context).currentLocale;
 
     return MaterialApp(
       title: 'KindMeals',
       debugShowCheckedModeBanner: false,
-      
+
       // Localization setup
       locale: currentLocale,
       supportedLocales: const [
         Locale('en', ''), // English
         Locale('hi', ''), // Hindi
         Locale('mr', ''), // Marathi
+        Locale('gu', ''), // Gujarati
+        Locale('te', ''), // Telugu
+        Locale('ta', ''), // Tamil
+        Locale('bn', ''), // Bengali
+        // Locale('kn', ''), // Kannada
+        // Locale('ml', ''), // Malayalam
       ],
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -127,7 +134,7 @@ class _KindMealsAppState extends State<KindMealsApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      
+
       theme: ThemeData(
         primarySwatch: Colors.green,
         scaffoldBackgroundColor: Colors.white,
@@ -168,7 +175,7 @@ class _KindMealsAppState extends State<KindMealsApp> {
 
 // Screen to check user type and redirect accordingly
 class _InitialLoadingScreen extends StatefulWidget {
-  const _InitialLoadingScreen({Key? key}) : super(key: key);
+  const _InitialLoadingScreen();
 
   @override
   State<_InitialLoadingScreen> createState() => _InitialLoadingScreenState();
@@ -196,7 +203,9 @@ class _InitialLoadingScreenState extends State<_InitialLoadingScreen> {
         }
       }
     } catch (e) {
-      print('Error checking user type: $e');
+      if (kDebugMode) {
+        print('Error checking user type: $e');
+      }
       // Default to regular dashboard if error occurs
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/dashboard');

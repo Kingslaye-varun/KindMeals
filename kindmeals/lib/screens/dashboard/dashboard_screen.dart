@@ -19,6 +19,7 @@ import 'volunteers_screen.dart';
 import '../notifications/notification_screen.dart';
 import '../charity/charity_donation_screen.dart';
 import 'package:flutter/foundation.dart';
+import '../../config/api_config.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -406,8 +407,8 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    
+    AppLocalizations.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -449,7 +450,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   Widget _buildWelcomeHeader() {
     final localizations = AppLocalizations.of(context);
-    
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
@@ -642,7 +643,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   Widget _buildVolunteerLeaderboard() {
     final localizations = AppLocalizations.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -714,7 +715,8 @@ class _HomeScreenState extends State<_HomeScreen> {
                     ],
                   ),
                   child: _volunteerLeaderboard.isEmpty
-                      ? _buildEmptyLeaderboardState(localizations.translate('no_volunteers_found'), true)
+                      ? _buildEmptyLeaderboardState(
+                          localizations.translate('no_volunteers_found'), true)
                       : Column(
                           children: [
                             // Header row
@@ -809,6 +811,7 @@ class _HomeScreenState extends State<_HomeScreen> {
                                           backgroundImage: _getImageProvider(
                                               volunteer['avatar']),
                                           onBackgroundImageError: (_, __) {},
+                                          backgroundColor: Colors.grey.shade300,
                                           child: volunteer['avatar']
                                                       .toString()
                                                       .isEmpty ||
@@ -831,7 +834,6 @@ class _HomeScreenState extends State<_HomeScreen> {
                                               ? const Icon(Icons.person,
                                                   color: Colors.white)
                                               : null,
-                                          backgroundColor: Colors.grey.shade300,
                                         ),
                                       ),
                                     ),
@@ -897,7 +899,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   Widget _buildEmptyLeaderboardState(String message, bool isVolunteer) {
     final localizations = AppLocalizations.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
       width: double.infinity,
@@ -940,7 +942,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   Widget _buildDonorLeaderboard() {
     final localizations = AppLocalizations.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1014,7 +1016,8 @@ class _HomeScreenState extends State<_HomeScreen> {
                     ],
                   ),
                   child: _donorLeaderboard.isEmpty
-                      ? _buildEmptyLeaderboardState(localizations.translate('no_donors_found'), false)
+                      ? _buildEmptyLeaderboardState(
+                          localizations.translate('no_donors_found'), false)
                       : Column(
                           children: [
                             // Header row
@@ -1113,6 +1116,7 @@ class _HomeScreenState extends State<_HomeScreen> {
                                           backgroundImage: _getImageProvider(
                                               donor['avatar']),
                                           onBackgroundImageError: (_, __) {},
+                                          backgroundColor: Colors.grey.shade300,
                                           child: donor['avatar']
                                                       .toString()
                                                       .isEmpty ||
@@ -1135,7 +1139,6 @@ class _HomeScreenState extends State<_HomeScreen> {
                                               ? const Icon(Icons.storefront,
                                                   color: Colors.white)
                                               : null,
-                                          backgroundColor: Colors.grey.shade300,
                                         ),
                                       ),
                                     ),
@@ -1214,7 +1217,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   Widget _buildReviews() {
     final localizations = AppLocalizations.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1364,7 +1367,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   Widget _buildCharitySection() {
     final localizations = AppLocalizations.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 40),
@@ -1583,7 +1586,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 
   Widget _buildFooter() {
     final localizations = AppLocalizations.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
       color: Colors.green.shade800,
@@ -1649,15 +1652,20 @@ class _HomeScreenState extends State<_HomeScreen> {
 
     final url = imageUrl.toString();
 
-    if (url.startsWith('http') || url.startsWith('https')) {
+    // Use our centralized image URL processing
+    final processedUrl = ApiConfig.getImageUrl(url);
+
+    // If the processed URL is empty (invalid path), return default image
+    if (processedUrl.isEmpty) {
+      return const AssetImage('assets/images/volunteer1.jpg');
+    }
+
+    if (processedUrl.startsWith('http') || processedUrl.startsWith('https')) {
       // Network image
-      return NetworkImage(url);
-    } else if (url.startsWith('/uploads')) {
-      // API server image (needs full URL)
-      return NetworkImage('${ApiService.baseUrl}$url');
-    } else if (url.startsWith('assets/')) {
+      return NetworkImage(processedUrl);
+    } else if (processedUrl.startsWith('assets/')) {
       // Asset image
-      return AssetImage(url);
+      return AssetImage(processedUrl);
     } else {
       // Default fallback
       return const AssetImage('assets/images/volunteer1.jpg');

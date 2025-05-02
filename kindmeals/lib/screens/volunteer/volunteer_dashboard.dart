@@ -1,17 +1,20 @@
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+
+import 'dart:io' show Platform;
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform;
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../services/firebase_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../config/api_config.dart';
 import '../../services/api_service.dart';
+import '../../services/firebase_service.dart';
 import '../../utils/date_time_helper.dart';
 import 'volunteerhistory.dart';
 import 'volunteerprofile.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../config/api_config.dart';
 
 class VolunteerDashboardScreen extends StatefulWidget {
   const VolunteerDashboardScreen({super.key});
@@ -94,8 +97,10 @@ class _VolunteerDashboardScreenState extends State<VolunteerDashboardScreen> {
         }).toList();
 
         if (validOpportunities.length < opportunities.length && kDebugMode) {
-          print(
+          if (kDebugMode) {
+            print(
               'Filtered out ${opportunities.length - validOpportunities.length} invalid opportunities');
+          }
         }
 
         setState(() {
@@ -253,7 +258,7 @@ class _VolunteerDashboardScreenState extends State<VolunteerDashboardScreen> {
         print('Using coordinates for directions: $hasValidCoordinates');
         if (hasValidCoordinates) {
           print(
-              'Donor coordinates: ${coordinates!['donor']['latitude']}, ${coordinates['donor']['longitude']}');
+              'Donor coordinates: ${coordinates['donor']['latitude']}, ${coordinates['donor']['longitude']}');
           print(
               'Recipient coordinates: ${coordinates['recipient']['latitude']}, ${coordinates['recipient']['longitude']}');
         }
@@ -278,7 +283,7 @@ class _VolunteerDashboardScreenState extends State<VolunteerDashboardScreen> {
         // Try Android-specific intent with coordinates if available
         if (hasValidCoordinates) {
           try {
-            final donorLat = coordinates!['donor']['latitude'];
+            final donorLat = coordinates['donor']['latitude'];
             final donorLng = coordinates['donor']['longitude'];
             final recipientLat = coordinates['recipient']['latitude'];
             final recipientLng = coordinates['recipient']['longitude'];
@@ -355,7 +360,7 @@ class _VolunteerDashboardScreenState extends State<VolunteerDashboardScreen> {
         // iOS approach - try with coordinates first if available
         if (hasValidCoordinates) {
           try {
-            final donorLat = coordinates!['donor']['latitude'];
+            final donorLat = coordinates['donor']['latitude'];
             final donorLng = coordinates['donor']['longitude'];
             final recipientLat = coordinates['recipient']['latitude'];
             final recipientLng = coordinates['recipient']['longitude'];
@@ -1553,45 +1558,4 @@ class _VolunteerDashboardScreenState extends State<VolunteerDashboardScreen> {
   }
 
   // Open address in maps
-  void _openMapForAddress(String address) async {
-    try {
-      final encodedAddress = Uri.encodeComponent(address);
-      final mapUrl = Platform.isIOS
-          ? 'https://maps.apple.com/?q=$encodedAddress'
-          : 'https://www.google.com/maps/search/?api=1&query=$encodedAddress';
-
-      if (await canLaunch(mapUrl)) {
-        await launch(mapUrl);
-      } else {
-        if (kDebugMode) {
-          print('Could not launch $mapUrl');
-        }
-
-        // If can't launch, copy to clipboard instead
-        await Clipboard.setData(ClipboardData(text: address));
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Address copied to clipboard'),
-              backgroundColor: Colors.blue,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error opening map: $e');
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not open map: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
 }

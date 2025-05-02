@@ -1,17 +1,27 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConfig {
   // API base URL - use environment variable
   static String get serverBaseUrl =>
-      dotenv.env['API_URL'] ?? 'http://192.168.1.27:5000';
+      dotenv.env['API_URL'] ??
+      'http://192.168.0.101:5000';
   static String get apiBaseUrl => '$serverBaseUrl/api';
 
   // Debug information
   static void printAPIConfig() {
-    print('====== API Configuration ======');
-    print('Server Base URL: $serverBaseUrl');
-    print('API Base URL: $apiBaseUrl');
-    print('==============================');
+    if (kDebugMode) {
+      print('====== API Configuration ======');
+    }
+    if (kDebugMode) {
+      print('Server Base URL: $serverBaseUrl');
+    }
+    if (kDebugMode) {
+      print('API Base URL: $apiBaseUrl');
+    }
+    if (kDebugMode) {
+      print('==============================');
+    }
   }
 
   // Method to get full image URL
@@ -21,15 +31,18 @@ class ApiConfig {
 
     // If the path already contains the full URL, return it as is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      if (kDebugMode) {
+        print('Using direct URL: $imagePath');
+      }
       return imagePath;
     }
 
-    // For image paths starting with /uploads, add the server base URL
+    // For image paths starting with /uploads, construct URL properly
     if (imagePath.startsWith('/uploads/')) {
-      // Use direct URL to handle server configuration with static files
-      final url = serverBaseUrl + imagePath;
-      print('Constructed image URL: $url');
-      return url;
+      if (kDebugMode) {
+        print('Using upload path: $imagePath');
+      }
+      return serverBaseUrl + imagePath;
     }
 
     // For any other case, assume it's a relative path and append to server base URL

@@ -1,9 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
 
 class DonationHistoryScreen extends StatefulWidget {
-  const DonationHistoryScreen({Key? key}) : super(key: key);
+  const DonationHistoryScreen({super.key});
 
   @override
   State<DonationHistoryScreen> createState() => _DonationHistoryScreenState();

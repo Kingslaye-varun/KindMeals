@@ -5,7 +5,7 @@ import 'charity_donation_screen.dart';
 import '../../utils/app_localizations.dart';
 
 class CharityListScreen extends StatefulWidget {
-  const CharityListScreen({Key? key}) : super(key: key);
+  const CharityListScreen({super.key});
 
   @override
   State<CharityListScreen> createState() => _CharityListScreenState();
@@ -155,7 +155,7 @@ class _CharityListScreenState extends State<CharityListScreen> {
         const SizedBox(height: 24),
 
         // Charity list
-        ..._charities.map((charity) => _buildCharityCard(charity, localizations)).toList(),
+        ..._charities.map((charity) => _buildCharityCard(charity, localizations)),
       ],
     );
   }
